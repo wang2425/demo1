@@ -1,12 +1,16 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
-// 定义一个APN结构体，包含APN名称、流量上限和流量使用量
+// 定义一个APN结构体，包含APN名称、流量上限和流量使用量2
 type APN struct {
 	Name       string    // APN名称
 	DataLimit  int       // 流量上限（单位：KB）
@@ -121,10 +125,14 @@ func main() {
 
 	for {
 		var test string
-		fmt.Print(" \n  打印SIM卡信息1\n  打印APN信息2\n  更改SIM卡状态3\n  更新流量上限4\n  更改已使用流量并判断是否达到最大流量上限5\n  更改的SIM到期时间6\n  判断Sim卡是否到期7\n  请输入指令: ")
-		//fmt.Print("请输入指令: ")
-		fmt.Scanf("%s", &test)
-
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("  \n  打印SIM卡信息1\n  打印APN信息2\n  更改SIM卡状态3\n  更新流量上限4\n  更改已使用流量并判断是否达到最大流量上限5\n  更改的SIM到期时间6\n  判断Sim卡是否到期7\n  请输入指令: \n")
+		test, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("输入出错:", err)
+			return
+		}
+		test = strings.TrimSpace(test)
 		switch test {
 		case "1":
 			{
@@ -228,18 +236,64 @@ func main() {
 			}
 		case "7":
 			{
-				var year1 int
-				var month1 int
-				var day1 int
-				var hour1 int
-				var min1 int
-				var sec1 int
-				var nsec1 int
-				fmt.Print("请输入要判断的时间:\n")
-				fmt.Scan(&year1, &month1, &day1, &hour1, &min1, &sec1, &nsec1)
+				var s string
+				reader := bufio.NewReader(os.Stdin)
+				fmt.Print("请输入时间 (格式: 年 月 日 时 分 秒 纳秒):\n")
+				s, err := reader.ReadString('\n')
+				if err != nil {
+					fmt.Println("输入出错:", err)
+					return
+				}
+
+				s = strings.TrimSpace(s)
+				slice := strings.Fields(s)
+
+				// 检查输入的切片长度是否足够
+				if len(slice) < 7 {
+					fmt.Println("输入格式错误，请输入: 年 月 日 时 分 秒 纳秒")
+					return
+				}
+
+				// 依次将切片中的字符串转换为对应的整型
+				year1, err := strconv.Atoi(slice[0])
+				if err != nil {
+					fmt.Println("年份转换错误:", err)
+					return
+				}
+				month1, err := strconv.Atoi(slice[1])
+				if err != nil {
+					fmt.Println("月份转换错误:", err)
+					return
+				}
+				day1, err := strconv.Atoi(slice[2])
+				if err != nil {
+					fmt.Println("日期转换错误:", err)
+					return
+				}
+				hour1, err := strconv.Atoi(slice[3])
+				if err != nil {
+					fmt.Println("小时转换错误:", err)
+					return
+				}
+				min1, err := strconv.Atoi(slice[4])
+				if err != nil {
+					fmt.Println("分钟转换错误:", err)
+					return
+				}
+				sec1, err := strconv.Atoi(slice[5])
+				if err != nil {
+					fmt.Println("秒钟转换错误:", err)
+					return
+				}
+				nsec1, err := strconv.Atoi(slice[6])
+				if err != nil {
+					fmt.Println("纳秒转换错误:", err)
+					return
+				}
+
 				month2 := time.Month(month1)
 				aExpiration := time.Date(year1, month2, day1, hour1, min1, sec1, nsec1, time.UTC)
-				simCard.DetermineExpiration(aExpiration)
+				fmt.Printf("转换后的时间为: %v\n", aExpiration)
 			}
 		}
 	}
