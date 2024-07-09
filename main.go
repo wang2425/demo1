@@ -99,6 +99,7 @@ func (s *Sim) DetermineExpiration(AExpiration time.Time) {
 	}
 }
 
+// 123421312312321312331qiuhdiuasiufcawehfoiawef
 func main() {
 	// 创建一个SIM卡实例
 	simCard := Sim{
